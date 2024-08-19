@@ -8,6 +8,7 @@ from torchvision import transforms
 import albumentations as A
 from albumentations import Compose, Resize, Normalize, HorizontalFlip
 from albumentations.pytorch import ToTensorV2
+import os
 
 st.markdown(
     """
@@ -49,13 +50,42 @@ def segment_image(image):
 
 # Streamlit interface
 st.title("U-net Image Segmentation")
-uploaded_file = st.file_uploader("Choose an image...", type="png")
 
-if uploaded_file is not None:
-# Read the image using PIL and convert it to a NumPy array
-    image = Image.open(uploaded_file)
+# Display Images to select
+# Define the path to the example images
+image_dir = "sample_images/"
+image_files = os.listdir(image_dir)
+sel_img = None
 
-    st.write('Name of the image file: ', uploaded_file.name)
+# Number of columns for the grid
+num_columns = 3
+
+# Display images in a grid
+for i in range(0, len(image_files), num_columns):
+    cols = st.columns(num_columns)
+    for j, col in enumerate(cols):
+        if i + j < len(image_files):
+            image_file = image_files[i + j]
+            image_path = os.path.join(image_dir, image_file)
+            image = Image.open(image_path)
+            with col:
+                if st.button(f"Select {image_file}"):
+                    selected_image = image_file
+                    sel_img = image
+                    st.session_state['selected_image'] = selected_image
+                st.image(image, caption=image_file, use_column_width=True)
+
+
+uploaded_file = st.file_uploader("Choose/Upload an image...", type="png")
+
+
+def perform_segmentation(is_uploaded, uploaded_file):
+    image = None
+    if is_uploaded:
+        image = Image.open(uploaded_file)
+        st.write('Name of the image file: ', uploaded_file.name)
+    else:
+        image = sel_img
 
     # Ensure the image is in RGB format
     if image.mode != 'RGB':
@@ -74,10 +104,10 @@ if uploaded_file is not None:
     scaled_segmented_image = np.clip(segmented_image, 0, 1)
     # predicted_mask = st.image(scaled_segmented_image, caption='Segmented    Image', use_column_width=True)
 
-
     if uploaded_file is not None and scaled_segmented_image is not None:
         # Read the images using PIL
-        image1 = Image.open(uploaded_file)
+        if is_uploaded:
+            image1 = Image.open(uploaded_file)
         image1 = image.resize((256, 256))
         image2 = scaled_segmented_image
 
@@ -90,3 +120,13 @@ if uploaded_file is not None:
         # Display the second image in the second column
         with col2:
             st.image(image2, caption='Segmented Image', use_column_width=True)
+
+
+# Driver Code
+
+if uploaded_file is not None:
+    # Read the image using PIL and convert it to a NumPy array
+    perform_segmentation(is_uploaded=True, uploaded_file=uploaded_file)
+else:
+    if sel_img is not None:
+        perform_segmentation(is_uploaded=False, uploaded_file=sel_img)
