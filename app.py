@@ -72,7 +72,7 @@ for i in range(0, len(image_files), num_columns):
                     selected_image = image_file
                     sel_img = image
                     st.session_state['selected_image'] = selected_image
-                st.image(image, caption=image_file, use_column_width=True)
+                st.image(image, caption=image_file)
 
 
 uploaded_file = st.file_uploader("Choose/Upload an image...", type="png")
