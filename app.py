@@ -115,10 +115,10 @@ def perform_segmentation(is_uploaded, uploaded_file):
 
         # Display the first image in the first column
         with col1:
-            st.image(image1, caption='Original Image', use_column_width=True)
+            st.image(image1, caption='Original Image', use_container_width=True)
         # Display the second image in the second column
         with col2:
-            st.image(image2, caption='Segmented Image', use_column_width=True)
+            st.image(image2, caption='Segmented Image', use_container_width=True)
 
 
 # Driver Code
