@@ -23,8 +23,7 @@ st.markdown(
 
 
 # Load your pre-trained U-net model from a .pkl file with CPU mapping
-model = torch.load('entire_model.pkl', 
-                map_location=torch.device('cpu'))
+model = torch.load('trained_unet_model.pkl', map_location=torch.device('cpu'))
 model.eval()
 
 # Define a function to preprocess the image
